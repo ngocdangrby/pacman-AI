@@ -24,12 +24,21 @@ For orders:  [('apples', 3.0)] best shop is shop2
 import shop
 
 def shopSmart(orderList, fruitShops):
-    """
+  """
         orderList: List of (fruit, numPound) tuples
         fruitShops: List of FruitShops
-    """
-    "*** YOUR CODE HERE ***"
-    return None
+  """
+  "*** YOUR CODE HERE ***"
+  minShop = None
+  minPrice = 99999.0
+  for shop in fruitShops:
+    totalThisShop = 0.0
+    for order in orderList:
+      totalThisShop += order[1] * shop.getCostPerPound(order[0])
+    if totalThisShop < minPrice:
+      minPrice = totalThisShop
+      minShop = shop
+  return minShop
 
 if __name__ == '__main__':
   "This code runs when you invoke the script from the command line"
