@@ -72,6 +72,7 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -81,24 +82,64 @@ def depthFirstSearch(problem):
 
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
-
     print "Start:", problem.getStartState()
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+
+    frontier = util.PriorityQueue()
+    visited = []
+    frontier.push((problem.getStartState(), [], 0), 0)
+    while not frontier.isEmpty():
+        state, actions, cost = frontier.pop()
+        if state not in visited:
+            visited.append(state)
+            if problem.isGoalState(state):
+                return actions
+            for next in problem.getSuccessors(state):
+                new_state = next[0]
+                new_direction = next[1]
+                frontier.update((new_state, actions + [new_direction], -len(actions)),  -len(actions))
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    frontier = util.PriorityQueue()
+    visited = []
+    frontier.push((problem.getStartState(), [], 0), 0)
+    while not frontier.isEmpty():
+        state, actions, cost = frontier.pop()
+        if state not in visited:
+            visited.append(state)
+            if problem.isGoalState(state):
+                return actions
+            for next in problem.getSuccessors(state):
+                new_state = next[0]
+                new_direction = next[1]
+                frontier.update((new_state, actions + [new_direction], len(actions)),  len(actions))
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    frontier = util.PriorityQueue()
+    visited = []
+    frontier.push((problem.getStartState(), [], 0), 0)
+    while not frontier.isEmpty():
+        state, actions, cost = frontier.pop()
+        if state not in visited:
+            visited.append(state)
+            if problem.isGoalState(state):
+                return actions
+            for next in problem.getSuccessors(state):
+                new_state = next[0]
+                new_direction = next[1]
+                new_cost = next[2]
+                frontier.update((new_state, actions + [new_direction], new_cost + cost), new_cost + cost)
     util.raiseNotDefined()
-
+    
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
@@ -109,6 +150,20 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    frontier = util.PriorityQueue()
+    visited = []
+    frontier.push((problem.getStartState(), [], 0), 0)
+    while not frontier.isEmpty():
+        state, actions, cost = frontier.pop()
+        if state not in visited:
+            visited.append(state)
+            if problem.isGoalState(state):
+                return actions
+            for next in problem.getSuccessors(state):
+                new_state = next[0]
+                new_direction = next[1]
+                new_cost = next[2]
+                frontier.update((new_state, actions + [new_direction], new_cost + cost), new_cost + cost + heuristic(new_state,problem))
     util.raiseNotDefined()
 
 

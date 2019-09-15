@@ -197,7 +197,7 @@ class PriorityQueue:
         # If item not in priority queue, do the same thing as self.push.
         for index, (p, c, i) in enumerate(self.heap):
             if i == item:
-                if p <= priority:
+                if p <= priority: 
                     break
                 del self.heap[index]
                 self.heap.append((priority, c, item))
