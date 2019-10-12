@@ -386,13 +386,11 @@ def cornersHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
     state_ = state[0]
     visited_corner = state[1]
-
     unvisited_corner = []
     sum = 0
     for corner in corners:
         if corner not in visited_corner:
             unvisited_corner.append(corner)
-    
     current = state_
     while(len(unvisited_corner) > 0):
         distance, corner = min([(util.manhattanDistance(current, corner), corner) for corner in unvisited_corner])

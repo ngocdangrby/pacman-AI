@@ -97,7 +97,7 @@ def depthFirstSearch(problem):
             visited.append(state)
             if problem.isGoalState(state):
                 return actions
-            for next in problem.getSuccessors(state):
+            for next in reversed(problem.getSuccessors(state)):
                 new_state = next[0]
                 new_direction = next[1]
                 frontier.update((new_state, actions + [new_direction], -len(actions)),  -len(actions))
@@ -163,7 +163,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 new_state = next[0]
                 new_direction = next[1]
                 new_cost = next[2]
-                frontier.update((new_state, actions + [new_direction], new_cost + cost), new_cost + cost + heuristic(new_state,problem))
+                frontier.update((new_state, actions + [new_direction], new_cost + cost ), new_cost + cost + heuristic(new_state,problem))
     util.raiseNotDefined()
 
 
