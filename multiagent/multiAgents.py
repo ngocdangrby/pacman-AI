@@ -86,9 +86,9 @@ class ReflexAgent(Agent):
             if dist_to_ghost <= 2 : return -200
             
         if len(foodList) > 0:
-          dist = 1.0/(min([manhattanDistance(newPos, foodPos) for foodPos in foodList])+5) + successorGameState.getScore()
+            dist = 1.0/(min([manhattanDistance(newPos, foodPos) for foodPos in foodList])+5) + successorGameState.getScore()
         else:
-          dist = successorGameState.getScore()
+            dist = successorGameState.getScore()
 
         return dist
         # print (pacPos, newPos, dis, successorGameState.getScore())
@@ -148,10 +148,48 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        
+        res = self.value(gameState, 0)
+        return res[0]
 
 
-        util.raiseNotDefined()
+    def value(self,state, depth):
+        if  depth == self.depth * state.getNumAgents() or state.isWin() or state.isLose():
+            return  (None, self.evaluationFunction(state))
+        if(self.is_pacman_turn(state, depth)):
+            return self.max_value(state, depth)
+        else:
+            return self.min_value(state, depth)
+
+    def max_value(self, state, depth):
+        actions = state.getLegalActions(0)
+        if len(actions) == 0:
+            return (None, self.evaluationFunction(state))
+        max_result = (None, -float('inf'))
+        for action in actions:
+            succ = state.generateSuccessor(0, action)
+            res = self.value(succ, depth+1)
+            if(res[1] > max_result[1]):
+                    max_result = (action,res[1])
+        return max_result
+
+    def min_value(self, state, depth):
+        actions = state.getLegalActions(self.get_agent_turn(state, depth))
+        if len(actions) == 0:
+            return (None, self.evaluationFunction(state))
+
+        min_result = (None, float('inf'))
+        for action in actions:
+            succ = state.generateSuccessor(self.get_agent_turn(state, depth), action)
+            res = self.value(succ, depth+1)
+            if(res[1] < min_result[1]):
+                    min_result = (action,res[1])
+        return min_result
+
+
+    def is_pacman_turn(self, state, depth):
+        return self.get_agent_turn(state, depth) == 0
+    def get_agent_turn(self, state, depth):
+        return depth % state.getNumAgents()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -163,7 +201,55 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        res = self.value(gameState, 0,alpha= -float('inf'), beta=float('inf'))
+        return res[0]
+
+
+    def value(self,state, depth, alpha, beta):
+        if  depth == self.depth * state.getNumAgents() or state.isWin() or state.isLose():
+            return  (None, self.evaluationFunction(state))
+        if(self.is_pacman_turn(state, depth)):
+            return self.max_value(state, depth, alpha, beta)
+        else:
+            return self.min_value(state, depth, alpha, beta)
+
+    def max_value(self, state, depth, alpha, beta):
+        actions = state.getLegalActions(0)
+        if len(actions) == 0:
+            return (None, self.evaluationFunction(state))
+        v = (None, -float('inf'))
+        for action in actions:
+            succ = state.generateSuccessor(0, action)
+            # v = max(v, self.value(succ, depth+1, alpha, beta), key=lambda x: x[1])
+            res = self.value(succ, depth+1, alpha, beta)
+            if res[1] > v[1]:
+                v = (action, res[1])
+            if(v[1] > beta):
+                return v
+            alpha = max(alpha,v[1])
+        return v    
+
+    def min_value(self, state, depth, alpha, beta):
+        actions = state.getLegalActions(self.get_agent_turn(state, depth))
+        if len(actions) == 0:
+            return (None, self.evaluationFunction(state))
+        v = (None, float('inf'))
+        for action in actions:
+            succ = state.generateSuccessor(self.get_agent_turn(state, depth), action)
+            v = min(v, self.value(succ, depth+1, alpha, beta), key=lambda x: x[1])
+            if v[1] < alpha:
+                return v
+            beta = min(beta,v[1])
+        return v
+
+
+    def is_pacman_turn(self, state, depth):
+        return self.get_agent_turn(state, depth) == 0
+    def get_agent_turn(self, state, depth):
+        return depth % state.getNumAgents()
+
+
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
