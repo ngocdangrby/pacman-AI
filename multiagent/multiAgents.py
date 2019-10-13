@@ -68,14 +68,33 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
+        pacPos = currentGameState.getPacmanPosition()
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
+        newGhostPos = successorGameState.getGhostPosition(1)
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        # print(pacPos,newPos,successorGameState.getScore())
+        # return successorGameState.getScore()
+       
+        foodList = currentGameState.getFood().asList()
+        
+        for index in range(len(newGhostStates)):
+            dist_to_ghost = util.manhattanDistance(newPos, newGhostStates[index].getPosition())
+            if dist_to_ghost <= 2 : return -200
+            
+        if len(foodList) > 0:
+          dist = 1.0/(min([manhattanDistance(newPos, foodPos) for foodPos in foodList])+5) + successorGameState.getScore()
+        else:
+          dist = successorGameState.getScore()
 
+        return dist
+        # print (pacPos, newPos, dis, successorGameState.getScore())
+        # print ( [manhattanDistance(newPos, foodPos) for foodPos in foodList])
+        
+        # return 100
 def scoreEvaluationFunction(currentGameState):
     """
       This default evaluation function just returns the score of the state.
@@ -129,6 +148,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        
+
+
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
