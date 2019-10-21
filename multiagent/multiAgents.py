@@ -242,12 +242,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             beta = min(beta,v[1])
         return v
 
-
-    def is_pacman_turn(self, state, depth):
-        return self.get_agent_turn(state, depth) == 0
     def get_agent_turn(self, state, depth):
         return depth % state.getNumAgents()
-
+    def is_pacman_turn(self, state, depth):
+        return self.get_agent_turn(state, depth) == 0
 
 
 
@@ -264,7 +262,50 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        res = self.value(gameState, 0)
+        return res[0]
+
+
+    def value(self,state, depth):
+        if  depth == self.depth * state.getNumAgents() or state.isWin() or state.isLose():
+            return  (None, self.evaluationFunction(state))
+        if(self.is_pacman_turn(state, depth)):
+            return self.max_value(state, depth)
+        else:
+            return self.exp_value(state, depth)
+
+    def max_value(self, state, depth):
+        actions = state.getLegalActions(0)
+        if len(actions) == 0:
+            return (None, self.evaluationFunction(state))
+        max_result = (None, -float('inf'))
+        for action in actions:
+            succ = state.generateSuccessor(0, action)
+            res = self.value(succ, depth+1)
+            if(res[1] > max_result[1]):
+                    max_result = (action,res[1])
+        return max_result
+
+    def exp_value(self, state, depth):
+        actions = state.getLegalActions(self.get_agent_turn(state, depth))
+        if len(actions) == 0:
+            return (None, self.evaluationFunction(state))
+
+        exp_result = 0
+        for action in actions:
+            succ = state.generateSuccessor(self.get_agent_turn(state, depth), action)
+            # print(succ)
+            p = 1.0/float(len(actions))
+            res = self.value(succ, depth+1)
+            exp_result += p * res[1]
+        return (None, exp_result)
+
+
+    def is_pacman_turn(self, state, depth):
+        return self.get_agent_turn(state, depth) == 0
+    def get_agent_turn(self, state, depth):
+        return depth % state.getNumAgents()
+
 
 def betterEvaluationFunction(currentGameState):
     """
