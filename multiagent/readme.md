@@ -281,7 +281,8 @@ Giải thích:
 - Khi _scaredTimes_ > 3 (tránh rượt "quá đà", không rút kịp)thì truy đuổi ma bằng cách tăng trọng số **(1.0/kc_manhattan_từ_Pac->Ghost) * trọng_số = 1000**
 - Thêm né ma khi _scareTimes_ == 0 bằng cách return âm khi gần ma (khoảng cách <=2) 
 - Trả về tổng các giá trị trên và state.getScore()
-##Tổng kết
+
+## Tổng kết
 
 ```bash
 Provisional grades
