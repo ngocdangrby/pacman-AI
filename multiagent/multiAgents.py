@@ -298,7 +298,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             p = 1.0/float(len(actions))
             res = self.value(succ, depth+1)
             exp_result += p * res[1]
-        return (None, exp_result)
+            result = (action, exp_result)
+        return result
 
 
     def is_pacman_turn(self, state, depth):
@@ -315,8 +316,46 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # successorGameState = currentGameState.generatePacmanSuccessor(action)
+    
+    # newPos = successorGameState.getPacmanPosition()
+    # newFood = successorGameState.getFood()
+    # newGhostStates = successorGameState.getGhostStates()
+    # newGhostPos = successorGameState.getGhostPosition(1)
+    ghostStates = currentGameState.getGhostStates()
+    ghostPos = currentGameState.getGhostPosition(1)
+    scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
+    pacPos = currentGameState.getPacmanPosition()
 
+    foodList = currentGameState.getFood().asList()
+    bigFoodList = currentGameState.getCapsules()
+
+    score  = 0
+    "*** YOUR CODE HERE ***"
+    # print(pacPos,newPos,successorGameState.getScore())
+    # return successorGameState.getScore()
+       
+  
+    
+    if len(bigFoodList) > 0:
+        score += (1.0/(min([manhattanDistance(pacPos, bigFoodPos) for bigFoodPos in bigFoodList])+2))*50
+
+    if len(ghostStates) > 0:
+        for x, ghostState in enumerate(ghostStates):
+            if(scaredTimes  > 3):
+                score += (1.0/(manhattanDistance(pacPos, ghostState.getPosition())+2))*100
+            else:
+                score -= (1.0/(manhattanDistance(pacPos, ghostState.getPosition())+2))
+            
+
+    for index in range(len(ghostStates)):
+        dist_to_ghost = util.manhattanDistance(pacPos, ghostStates[index].getPosition())
+        if dist_to_ghost <= 2 : return -200
+        
+    if len(foodList) > 0:
+        score += (1/(min([manhattanDistance(pacPos, foodPos) for foodPos in foodList])+2))*30
+  
+    return score + currentGameState.getScore()
 # Abbreviation
 better = betterEvaluationFunction
 
