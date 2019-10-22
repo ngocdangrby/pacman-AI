@@ -15,7 +15,7 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
-
+    
 from game import Agent
 
 class ReflexAgent(Agent):
@@ -81,20 +81,18 @@ class ReflexAgent(Agent):
        
         foodList = currentGameState.getFood().asList()
         
+
+            
+        if len(foodList) > 0:
+            score = 1.0/(min([manhattanDistance(newPos, foodPos) for foodPos in foodList])+5) + successorGameState.getScore()
+        else:
+            score = successorGameState.getScore()
+
         for index in range(len(newGhostStates)):
             dist_to_ghost = util.manhattanDistance(newPos, newGhostStates[index].getPosition())
             if dist_to_ghost <= 2 : return -200
-            
-        if len(foodList) > 0:
-            dist = 1.0/(min([manhattanDistance(newPos, foodPos) for foodPos in foodList])+5) + successorGameState.getScore()
-        else:
-            dist = successorGameState.getScore()
+        return score
 
-        return dist
-        # print (pacPos, newPos, dis, successorGameState.getScore())
-        # print ( [manhattanDistance(newPos, foodPos) for foodPos in foodList])
-        
-        # return 100
 def scoreEvaluationFunction(currentGameState):
     """
       This default evaluation function just returns the score of the state.
@@ -184,7 +182,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
             if(res[1] < min_result[1]):
                     min_result = (action,res[1])
         return min_result
-
 
     def is_pacman_turn(self, state, depth):
         return self.get_agent_turn(state, depth) == 0
@@ -316,12 +313,7 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    # successorGameState = currentGameState.generatePacmanSuccessor(action)
-    
-    # newPos = successorGameState.getPacmanPosition()
-    # newFood = successorGameState.getFood()
-    # newGhostStates = successorGameState.getGhostStates()
-    # newGhostPos = successorGameState.getGhostPosition(1)
+
     ghostStates = currentGameState.getGhostStates()
     ghostPos = currentGameState.getGhostPosition(1)
     scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
@@ -329,32 +321,22 @@ def betterEvaluationFunction(currentGameState):
 
     foodList = currentGameState.getFood().asList()
     bigFoodList = currentGameState.getCapsules()
-
     score  = 0
-    "*** YOUR CODE HERE ***"
-    # print(pacPos,newPos,successorGameState.getScore())
-    # return successorGameState.getScore()
-       
-  
-    
+   
     if len(bigFoodList) > 0:
-        score += (1.0/(min([manhattanDistance(pacPos, bigFoodPos) for bigFoodPos in bigFoodList])+2))*50
+        score += (1.0/(min([util.manhattanDistance(pacPos, bigFoodPos) for bigFoodPos in bigFoodList])+5))*200
 
     if len(ghostStates) > 0:
-        for x, ghostState in enumerate(ghostStates):
-            if(scaredTimes  > 3):
-                score += (1.0/(manhattanDistance(pacPos, ghostState.getPosition())+2))*100
+        for  x, ghostState in enumerate(ghostStates):
+            if(scaredTimes[x] > 3):
+                score += (1.0/(util.manhattanDistance(pacPos, ghostState.getPosition())+5))*1000
             else:
-                score -= (1.0/(manhattanDistance(pacPos, ghostState.getPosition())+2))
-            
+                dist_to_ghost = util.manhattanDistance(pacPos, ghostState.getPosition())
+                if dist_to_ghost <= 2: return -1000
 
-    for index in range(len(ghostStates)):
-        dist_to_ghost = util.manhattanDistance(pacPos, ghostStates[index].getPosition())
-        if dist_to_ghost <= 2 : return -200
-        
     if len(foodList) > 0:
-        score += (1/(min([manhattanDistance(pacPos, foodPos) for foodPos in foodList])+2))*30
-  
+        score += (1.0/(min([util.manhattanDistance(pacPos, foodPos) for foodPos in foodList])+5))*10
+
     return score + currentGameState.getScore()
 # Abbreviation
 better = betterEvaluationFunction
