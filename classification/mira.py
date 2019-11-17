@@ -61,7 +61,53 @@ class MiraClassifier:
         representing a vector of values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        max_acc, max_C, max_weights = max([self.get_accuracy_c_weight( c, trainingData, trainingLabels, validationData, validationLabels ) for c in Cgrid])
+        self.weights = max_weights
+
+    def get_accuracy_c_weight(self, c, trainingData, trainingLabels, validationData, validationLabels ):
+        weights = self.weights.copy()
+        max_acc, max_weights = float('-inf'), None
+        for iteration in range(self.max_iterations):
+            print "Starting iteration ", iteration, "..."
+            for i in range(len(trainingData)):
+                f = trainingData[i]
+                ytrue = trainingLabels[i]
+                score_max, ypred = max([
+                    (f * weights[y],y) for y in self.legalLabels])
+                if ypred != ytrue:
+                    tau = self.get_tau(c, weights[ypred], weights[ytrue], f)
+                    ftau = f.copy()
+                    for key in ftau.keys():
+                        ftau[key] = 1.0 * ftau[key] * tau
+                    weights[ytrue] += ftau
+                    weights[ypred] -= ftau
+            accuracy = self.get_accuracy(weights, validationData, validationLabels)
+            if accuracy > max_acc:
+                max_acc = accuracy
+                max_weights = weights.copy()
+            print "iteration", iteration, "c =", c, "accuracy =", accuracy
+        return max_acc, c, max_weights
+
+    
+    
+    def get_tau(self, c, wypred, wytrue, f):
+        sub = wypred-wytrue
+        nominator = sub*f+1
+        denominator = f*f*2
+        #print 'tmp', nominator, denominator, 1.0*nominator/denominator
+        return min(c, 1.0*nominator/denominator)
+    
+    
+    def get_accuracy(self, weights, validationData, validationLabels):
+        count = 0.0
+        for i in range(len(validationData)):
+            f = validationData[i]
+            ytrue = validationLabels[i]
+            score_max, ypred = max([
+                (f * weights[y],y) for y in self.legalLabels])
+            if ypred == ytrue:
+                count += 1
+        return count / len(validationData)
 
     def classify(self, data ):
         """
