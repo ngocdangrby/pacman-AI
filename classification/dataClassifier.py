@@ -72,17 +72,41 @@ def enhancedFeatureExtractorDigit(datum):
     for this datum (datum is of type samples.Datum).
 
     ## DESCRIBE YOUR ENHANCED FEATURES HERE...
-
+        view readme.md
     ##
     """
     features =  basicFeatureExtractorDigit(datum)
-
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    mat = features.copy()
+    num_white_regions = count_white_region(mat)
+    # print(num_white_regions)
+    features["1white"] = (num_white_regions == 1)
+    features["2white"] = (num_white_regions == 2)
+    features["3white"] = (num_white_regions == 3)
 
     return features
 
 
+def count_white_region(mat):
+    visited = util.Counter()
+    count = 0
+    for i in range(DIGIT_DATUM_WIDTH):
+        for j in range(DIGIT_DATUM_HEIGHT):
+            if mat[i,j] == 0:
+                dfs(i,j, mat) 
+                count += 1
+
+    return count
+
+def dfs(i,j, mat):
+    if(mat[i,j]) == 1:
+        return
+    mat[i,j] = 1
+    succ = [(1,0),(-1,0),(0,-1),(0,1)]
+    for s in succ:
+        new_pos = (s[0] + i, s[1] + j)
+        if new_pos[0] >= DIGIT_DATUM_WIDTH or new_pos[0] < 0 or new_pos[1] >= DIGIT_DATUM_HEIGHT or new_pos[1] < 0: continue
+        dfs(new_pos[0], new_pos[1], mat)
 
 def basicFeatureExtractorPacman(state):
     """
