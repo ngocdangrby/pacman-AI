@@ -147,9 +147,25 @@ def enhancedPacmanFeatures(state, action):
     It should return a counter with { <feature name> : <feature value>, ... }
     """
     features = util.Counter()
+    # print(state)
+    # print(action)
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    foods = state.getFood()
+    successor = state.generateSuccessor(0, action)
+    pac_pos = successor.getPacmanPosition()
+    ghosts = successor.getGhostPositions()
+    capsules = successor.getCapsules()
+    ghostStates = successor.getGhostStates()   
+
+    features['food'] = foods
+    features['successor'] = successor
+    features['pac_pos'] = pac_pos
+    features['ghosts'] = ghosts
+    features['capsules'] = capsules
+    features['ghostStates'] = ghostStates
+
     return features
+
 
 
 def contestFeatureExtractorDigit(datum):
