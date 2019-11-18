@@ -150,22 +150,34 @@ def enhancedPacmanFeatures(state, action):
     # print(state)
     # print(action)
     "*** YOUR CODE HERE ***"
-    foods = state.getFood()
+    foods = state.getFood().asList()
+    # features['foodcount'] = len(foods)
+
+
     successor = state.generateSuccessor(0, action)
     pac_pos = successor.getPacmanPosition()
-    ghosts = successor.getGhostPositions()
     capsules = successor.getCapsules()
     ghostStates = successor.getGhostStates()   
 
-    features['food'] = foods
-    features['successor'] = successor
-    features['pac_pos'] = pac_pos
-    features['ghosts'] = ghosts
-    features['capsules'] = capsules
-    features['ghostStates'] = ghostStates
+    # nearest food 
+    tmp = [util.manhattanDistance(food, pac_pos) for food in foods]
+    if len(tmp)== 0: nearest_food = 0
+    else: nearest_food = min(tmp)
+    features["nearest_food"] = nearest_food
+   
+    # nearest BIG food 
+    tmp = [util.manhattanDistance(cap, pac_pos) for cap in capsules]
+    if len(tmp) == 0: nearest_big_food = 0
+    else: nearest_big_food = min(tmp)
+    features["nearest_big_food"] = nearest_big_food
+    
+    # nearest ghost
+    tmp = [util.manhattanDistance(ghost.getPosition(), pac_pos) for ghost in ghostStates]
+    if len(tmp) == 0: nearest_ghost = 0
+    else: nearest_ghost = min(tmp)
+    features["nearest_ghost"] = nearest_ghost*0.5
 
     return features
-
 
 
 def contestFeatureExtractorDigit(datum):
